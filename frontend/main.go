@@ -28,13 +28,25 @@ type User struct {
 }
 
 func handleMatchmaking(w http.ResponseWriter, r *http.Request) {
+	// Enable CORS
+	header := w.Header()
+	header.Add("Access-Control-Allow-Origin", "*")
+	header.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
+	header.Add("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
+
+	// Handle preflight request
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	// Init OTEL tracer
 	tr := otel.Tracer("frontend")
 	ctx, span := tr.Start(context.Background(), "handleMatchmaking")
 	defer span.End()
 
 	// Check request was valid
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
@@ -118,7 +130,7 @@ func main() {
 
 	// Start REST API server
 	http.HandleFunc("/matchmaking", handleMatchmaking)
-	log.Println("Server started on ", hostAddr)
+	log.Println("Server started on", hostAddr)
 	err = http.ListenAndServe(hostAddr, nil)
 	if err != nil {
 		log.Fatalf("could not start server: %v\n", err)

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Matchmaking Form</title>
+</head>
+<body>
+    <h1>Matchmaking Form</h1>
+
+    <form id="matchmakingForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        
+        <label for="rangeInput">Range:</label>
+        <input type="range" id="rangeInput" name="rangeInput" min="0" max="100" required><br><br>
+        
+        <input type="submit" value="Start Matchmaking">
+    </form>
+
+    <table id="resultTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>MMR</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        document.getElementById("matchmakingForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent form submission
+            
+var form = event.target;
+var username = form.elements.username.value;
+var rangeInput = form.elements.rangeInput.value;
+
+var data = {
+    "username": username,
+    "mmr": parseInt(rangeInput)
+};
+
+fetch("http://172.25.244.20:8080/matchmaking", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+}).then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                displayResults(data);
+            })
+            .catch(function (error) {
+                console.log("Error:", error);
+            });
+        });
+
+        function displayResults(data) {
+            var tableBody = document.querySelector("#resultTable tbody");
+            tableBody.innerHTML = "";
+
+            for (var i = 0; i < data.usernames.length; i++) {
+                var row = document.createElement("tr");
+                var usernameCell = document.createElement("td");
+                var mmrCell = document.createElement("td");
+
+                usernameCell.textContent = data.usernames[i];
+                mmrCell.textContent = data.mmr[i];
+
+                row.appendChild(usernameCell);
+                row.appendChild(mmrCell);
+
+                tableBody.appendChild(row);
+            }
+
+            document.getElementById("resultTable").style.display = "table";
+        }
+    </script>
+</body>
+</html>
