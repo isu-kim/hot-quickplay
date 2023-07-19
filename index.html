@@ -1,57 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Matchmaking Form</title>
+    <title>Simple Matchmaking</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>Matchmaking Form</h1>
+    <div class="container mt-5">
+        <h1 class="mb-4">Simple Matchmaking</h1>
 
-    <form id="matchmakingForm">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required><br><br>
-        
-        <label for="rangeInput">Range:</label>
-        <input type="range" id="rangeInput" name="rangeInput" min="0" max="100" required><br><br>
-        
-        <input type="submit" value="Start Matchmaking">
-    </form>
+        <form id="matchmakingForm">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username:</label>
+                <input type="text" id="username" name="username" class="form-control" required>
+            </div>
 
-    <table id="resultTable" style="display: none;">
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>MMR</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+            <div class="mb-3">
+                <label for="rangeInput" class="form-label">Range:</label>
+                <input type="range" id="rangeInput" name="rangeInput" class="form-range" min="0" max="100" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Start Matchmaking</button>
+        </form>
+
+        <table id="resultTable" class="table mt-4" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>MMR</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 
     <script>
         document.getElementById("matchmakingForm").addEventListener("submit", function (event) {
             event.preventDefault(); // Prevent form submission
             
-var form = event.target;
-var username = form.elements.username.value;
-var rangeInput = form.elements.rangeInput.value;
+            var form = event.target;
+            var username = form.elements.username.value;
+            var rangeInput = form.elements.rangeInput.value;
 
-var data = {
-    "username": username,
-    "mmr": parseInt(rangeInput)
-};
+            var data = {
+                "username": username,
+                "mmr": parseInt(rangeInput)
+            };
 
-fetch("http://172.25.244.20:8080/matchmaking", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
-}).then(function (response) {
+            fetch("http://172.25.244.20:8080/matchmaking", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            }).then(function (response) {
                 return response.json();
-            })
-            .then(function (data) {
+            }).then(function (data) {
                 displayResults(data);
-            })
-            .catch(function (error) {
+            }).catch(function (error) {
                 console.log("Error:", error);
             });
         });
